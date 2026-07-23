@@ -22,24 +22,19 @@ pipeline {
             }
         }
         
-        stage('Static Code Analysis') {
-            environment {
-                SONAR_URL = "http://host.docker.internal:9000"
-            }
-            steps {
-                withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-                    sh '''
-                        cd java-maven-sonar-argocd-helm-k8s/spring-boot-app
-                        mvn sonar:sonar \
-                          -Dsonar.token=$SONAR_AUTH_TOKEN \
-                          -Dsonar.host.url=${SONAR_URL} \
-                          -Dsonar.projectKey=spring-boot-app \
-                          -Dsonar.projectName=spring-boot-app
-                    '''
-                }
-            }
-        }
-        
+	stage('Static Code Analysis') {
+   	 steps {
+        	withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+           	 sh '''
+                	cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn sonar:sonar \
+                 	 -Dsonar.token=$SONAR_AUTH_TOKEN \
+                	  -Dsonar.host.url=http://localhost:9000 \
+        	          -Dsonar.projectKey=spring-boot-app \
+	                  -Dsonar.projectName=spring-boot-app
+        	    '''
+        	}
+    	}
+}	        
         stage('Build and Push Docker Image') {
             environment {
                 DOCKER_IMAGE = "bogdibbarna/spring-boot-app:${BUILD_NUMBER}"
